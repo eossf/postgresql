@@ -1,0 +1,25 @@
+# Listen on all interfaces.
+listen_addresses = '*'
+
+# Special handle of data_sync_retry should handle only in some cases.
+data_sync_retry = off
+
+# Determines the maximum number of concurrent connections to the database server. Default: 100
+max_connections = ${POSTGRESQL_MAX_CONNECTIONS}
+
+# Allow each connection to use a prepared transaction
+max_prepared_transactions = ${POSTGRESQL_MAX_PREPARED_TRANSACTIONS}
+
+# Sets the amount of memory the database server uses for shared memory buffers. Default: 32MB
+shared_buffers = ${POSTGRESQL_SHARED_BUFFERS}
+
+# Sets the planner's assumption about the effective size of the disk cache that is available to a single query
+effective_cache_size = ${POSTGRESQL_EFFECTIVE_CACHE_SIZE}
+
+# - SSL -
+ssl = on
+ssl_ca_file = ''
+ssl_cert_file = '/var/lib/postgresql/tls/server.crt'
+ssl_crl_file = ''
+ssl_key_file = '/var/lib/postgresql/tls/server.key'
+ssl_ciphers = 'HIGH:MEDIUM:+3DES:!aNULL' # allowed SSL ciphers

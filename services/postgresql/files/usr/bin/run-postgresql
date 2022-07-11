@@ -1,0 +1,52 @@
+#!/bin/bash
+
+set -eu
+
+export POSTGRESQL_CONFIG_FILE=$HOME/custom-postgresql.conf
+export PGDATA=$HOME/data/userdata
+
+. "${CONTAINER_SCRIPTS_PATH}/common.sh"
+
+# Check that the right environment variables are set
+check_env_vars
+
+# Create and give the right permissions to the data folder
+set_pgdata
+
+# Make sure the Postgres user id is correct
+fix_passwd_file
+
+# Generate custom configurations settings loaded at the end of the file
+generate_custom_config
+
+PG_INITIALIZED=false
+
+# Initialize
+if [ ! -f "$PGDATA/postgresql.conf" ]; then
+	initialize_database
+	generate_config
+	PG_INITIALIZED=true
+fi
+
+# Start a temporary instance
+pg_ctl start -w --timeout 86400 -o "-h ''"
+
+# This is just a safety measure.
+pg_isready
+
+if $PG_INITIALIZED; then
+	# Create $POSTGRESQL_USER user
+	create_user
+fi
+
+# Set $POSTGRESQL_USER password
+set_password
+
+# Stop the temportary instance
+pg_ctl stop
+
+# Unset sensitive variables
+unset_env_vars
+
+echo "Starting server..."
+exec postgres "$@"

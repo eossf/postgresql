@@ -1,0 +1,22 @@
+version: '3.9'
+services:
+  postgresql:
+    build: .
+    image: postgres
+    user: "70:70"
+    environment:
+      - POSTGRESQL_USER=terraform
+      - POSTGRESQL_PASSWORD=0123456789012345
+      - POSTGRESQL_DATABASE=terraform
+      - POSTGRESQL_HOST_AUTH_METHOD=trust
+    ports:
+      - "5432:5432"
+    volumes: 
+      - "db:/var/lib/postgresql/data"
+      # live certificate, not directly used by postgresql server, they are copied into /var/lib/postgresql/tls
+      - "/mnt/c/DevOps/postgresql/services/postgresql/server.crt:/tls/server.crt:ro"
+      - "/mnt/c/DevOps/postgresql/services/postgresql/server.key:/tls/server.key:ro"
+
+volumes:
+  db:
+    driver: local

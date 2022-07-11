@@ -1,0 +1,62 @@
+#!/bin/bash
+
+export uid=70
+export write=w
+
+usage ()
+{
+	cat >&2 <<- EOF
+	${1-usage error}
+
+	Usage: $0 [--read-only] [--uid=UID] DIR [DIR ..]
+
+	Recursively fix permissions on the given directories to allow GID=0
+	read/write regular files and read/write/execute directories.
+
+	To run this command, you have to be in the group root=0!
+	EOF
+	exit 1
+}
+
+# $@ is all command line parameters passed to the script.
+# -o is for short options like -v
+# -l is for long options with double dash like --version
+# the comma separates different long options
+# -a is for long options with single dash like -version
+options=$(getopt -l "help,uid:,read-only" -o "hu:r" -a -- "$@")
+
+# set --:
+# If no arguments follow this option, then the positional parameters are unset. Otherwise, the positional parameters 
+# are set to the arguments, even if some of them begin with a ‘-’.
+eval set -- "$options"
+
+# parse option whatever the position
+while true
+do
+    case $1 in
+        -h|--help)
+            usage ""
+            exit 0
+            ;;
+        -u|--uid) 
+            shift
+            export uid=$1
+            ;;
+        -r|--read-only)
+            export write=
+            ;;
+        --)
+            shift
+            break;;
+    esac
+    shift
+done
+ 
+test $# -eq 0 && usage "no DIR specified"
+
+for dir; do
+	test -d "$dir" || usage "no such directory '$dir'"
+	find "$dir" -exec chown "$uid:0" {} \;
+	find "$dir" -exec chmod "g+r$write" {} \;
+	find "$dir" -type d -exec chmod g+x {} +
+done

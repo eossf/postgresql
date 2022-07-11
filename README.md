@@ -54,11 +54,11 @@ OpenSSL
 
 Simple postres db
 
-    docker run --name postgres --rm -d -e POSTGRES_USER=postgres -e POSTGRES_PASSWORD=0123456789012345 -e PGDATA=/var/lib/pgsql/data/pgdata -v /tmp:/var/lib/pgsql/data -p 5432:5432 -it postgres:12.11-alpine
+    docker run --name postgres --rm -d -e POSTGRES_USER=postgres -e POSTGRES_PASSWORD=0123456789012345 -e PGDATA=/var/lib/postgresql/data/pgdata -v /tmp:/var/lib/postgresql/data -p 5432:5432 -it postgres:12.11-alpine
 
 
 Generate keys and conf
+Run the script in the project repository /tmp "createkeys.sh" which creates keys in project tmp
 
-    docker build . -t createkeys
-    docker run --rm -it -w /tmp/postgres -v /tmp/postgres:/tmp/postgres createkeys
-    # run the script /root/createkeys.sh
+    docker build . -t postgres
+    docker run --rm -it -v "/mnt/c/DevOps/postgresql/tmp:/tmp/postgres" postgres bash
